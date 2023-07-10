@@ -110,5 +110,37 @@ namespace LSL.NSwag.CommonTypes.Tests
                 .Should()
                 .Be($"HTTP Response: \n\n{response}\n\nLSL.NSwag.CommonTypes.Client.SwaggerException: my message\n\nStatus: 400\nResponse: \n{expectedResponse}\r\n ---> System.Exception: Exception of type 'System.Exception' was thrown.\r\n   --- End of inner exception stack trace ---");
         }       
+
+        [Test]
+        public void GivenAGenericSwaggerExceptionIsCreated_ItShouldHaveTheExpectedProperties()
+        {
+            new SwaggerException<string>(
+                "my message", 
+                400, 
+                "a response", 
+                new ReadOnlyDictionary<string, IEnumerable<string>>(new Dictionary<string, IEnumerable<string>>
+                {
+                    ["Header"] = new List<string>
+                    {
+                        "header-value"
+                    }
+                }),
+                "my result object",
+                new Exception()
+            )
+            .Should()
+            .BeEquivalentTo(
+                new {
+                    StatusCode = 400,
+                    Response = "a response",
+                    Result = "my result object",
+                    Headers = new Dictionary<string,  IEnumerable<string>>()
+                    {
+                        ["Header"] = new[] { "header-value" }
+                    },
+                    InnerException = new Exception()
+                }
+            );
+        }        
     }
 }
